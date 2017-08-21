@@ -19,13 +19,14 @@ hostnotes=''
 verbose=False
 outputarray=[]
 def printhelp():
-	print "usage: itsi_alert -s=splunkhost -p=splunkport -t=splunktoken -o=title -d=description -x=status[numeric1-5] -z=severity[numeric[1-5] [-l=alertinghoststate -r=alertingcheckcommand -v=true]"
+	print "usage: itsi_alert -s=splunkhost -p=splunkport -t=splunktoken -o=title -d=description -h=myhostname -x=status[numeric1-5] -z=severity[numeric[1-5] [-l=alertinghoststate -r=alertingcheckcommand -v=true]"
 	print "-h Prints the help screen"
 	print "-s=splunkhost - ip or DNS resolvable name of splunk indexer"
 	print "-p=splunkport - portnumber for HEC - if in doubt go with 8088"
 	print "-t=splunktoken - HEC token for notable events"
 	print "-o=title - Title for Notable Event"
 	print "-d=description - Description for Notable Event"
+	print "-h=hostname - Name of the reporting host"
 	print "-x=status 1-New, 2-In Progress, 3-Pending ..."
 	print "-z=severity 1-Info, 2-Info, 3-Low ..."
 	print "-l=state - Optional - can pass in a state for the host"
@@ -40,6 +41,7 @@ def constructevent():
 	data['event_id'] = str(uuid.uuid4())
 	data['title']=title	
 	data['description']=description
+	data['hostname']=hostname
 	data['status']=status
 	data['severity']=severity
 	if (len(hoststate)>2):
@@ -69,7 +71,19 @@ try:
 			if "-x=" in sys.argv[mycounter]:
 				status=int(sys.argv[mycounter][3:])
 			if "-z=" in sys.argv[mycounter]:
-				severity=int(sys.argv[mycounter][3:])
+				try:
+					severity=int(sys.argv[mycounter][3:])
+				except:
+					log ("severity is not an integer -> trying string match")
+				try:
+					if "CRITICAL" in sys.argv[mycounter][3:]:
+						severity=5
+					if "WARNING" in sys.argv[mycounter][3:]:
+						severity=3
+					if "OK" in sys.argv[mycounter][3:]:
+						severity=2
+				except:
+					print "severity is not a string match"
 			if "-l=" in sys.argv[mycounter]:
 				hoststate=str(sys.argv[mycounter][3:])
 			if "-r=" in sys.argv[mycounter]:
@@ -80,6 +94,7 @@ try:
 			log ("port="+port)
 			log ("token="+token)
 			log ("title="+title)
+			log ("hostname="+hostname)
 			log ("description="+description)
 			log ("status="+str(status))
 			log ("severity="+str(severity))
