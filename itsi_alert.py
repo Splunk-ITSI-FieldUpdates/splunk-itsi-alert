@@ -19,14 +19,14 @@ hostnotes=''
 verbose=False
 outputarray=[]
 def printhelp():
-	print "usage: itsi_alert -s=splunkhost -p=splunkport -t=splunktoken -o=title -d=description -h=myhostname -x=status[numeric1-5] -z=severity[numeric[1-5] [-l=alertinghoststate -r=alertingcheckcommand -v=true]"
+	print "usage: itsi_alert -s=splunkhost -p=splunkport -t=splunktoken -o=title -d=description -q=myhostname -x=status[numeric1-5] -z=severity[numeric[1-5] [-l=alertinghoststate -r=alertingcheckcommand -v=true]"
 	print "-h Prints the help screen"
 	print "-s=splunkhost - ip or DNS resolvable name of splunk indexer"
 	print "-p=splunkport - portnumber for HEC - if in doubt go with 8088"
 	print "-t=splunktoken - HEC token for notable events"
 	print "-o=title - Title for Notable Event"
 	print "-d=description - Description for Notable Event"
-	print "-h=hostname - Name of the reporting host"
+	print "-q=hostname - Name of the reporting host"
 	print "-x=status 1-New, 2-In Progress, 3-Pending ..."
 	print "-z=severity 1-Info, 2-Info, 3-Low ..."
 	print "-l=state - Optional - can pass in a state for the host"
@@ -62,6 +62,8 @@ try:
 					port=str(sys.argv[mycounter][3:])
 				except:
 					port="8088"
+			if "-q=" in sys.argv[mycounter]:
+				hostname=str(sys.argv[mycounter][3:])
 			if "-t=" in sys.argv[mycounter]:
 				token=str(sys.argv[mycounter][3:])
 			if "-o=" in sys.argv[mycounter]:
